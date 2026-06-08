@@ -8,8 +8,9 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
-import { COLORS, SPACING, TYPOGRAPHY } from "../theme";
+import { useTheme, SPACING, TYPOGRAPHY } from "../theme";
 import CustomInput from "../components/CustomInput";
 import CustomDropdown from "../components/CustomDropdown";
 import CustomButton from "../components/CustomButton";
@@ -22,6 +23,9 @@ import {
 } from "../constants/data";
 
 export default function AMSUpdateScreen() {
+  const { theme, toggleTheme, COLORS } = useTheme();
+  const styles = createStyles(COLORS);
+
   const [depot, setDepot] = useState("");
   const [trainNo, setTrainNo] = useState("");
   const [section, setSection] = useState("");
@@ -54,8 +58,14 @@ export default function AMSUpdateScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
+      <View style={styles.headerContainer}>
         <Text style={styles.title}>AMS CONTROL PANEL</Text>
+        <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>
+          <Feather name={theme === "dark" ? "moon" : "sun"} size={24} color={COLORS.textPrimary} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.container}>
 
         {/* Depot */}
         <CustomDropdown
@@ -135,12 +145,22 @@ export default function AMSUpdateScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
     backgroundColor: COLORS.background,
     paddingVertical: SPACING.large,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: SPACING.medium,
+    marginTop: SPACING.large,
+  },
+  themeToggle: {
+    padding: SPACING.xs,
   },
   container: {
     padding: SPACING.medium,
@@ -154,8 +174,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: COLORS.primary,
-    marginBottom: SPACING.large,
-    textAlign: "center",
     letterSpacing: 1,
   },
   linkContainer: {

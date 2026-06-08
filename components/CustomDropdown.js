@@ -6,15 +6,20 @@ import {
     StyleSheet,
     TextInput,
 } from "react-native";
-import { COLORS, SPACING, TYPOGRAPHY } from "../theme";
 
+import { Ionicons } from "@expo/vector-icons";
+
+import { useTheme, SPACING, TYPOGRAPHY } from "../theme";
 export default function CustomDropdown({
     label,
     selectedValue,
     setSelectedValue,
     options = [],
-    keyboardEnabled = false, // 🔥 control keyboard
+    keyboardEnabled = false,
 }) {
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
+
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState("");
 
@@ -30,82 +35,120 @@ export default function CustomDropdown({
 
     return (
         <View style={styles.container}>
+            {/* Label */}
             {label && <Text style={styles.label}>{label}</Text>}
 
-            {/* 🔥 Input / Selector */}
+            {/* Dropdown Input */}
             <TouchableOpacity
                 activeOpacity={1}
-                onPress={() => setIsOpen(true)}
+                onPress={() => setIsOpen(!isOpen)}
             >
-                <TextInput
-                    style={styles.input}
-                    placeholder="Select option"
-                    placeholderTextColor={COLORS.placeholder}
-                    value={search || selectedValue}
-                    editable={keyboardEnabled} // ✅ keyboard control
-                    showSoftInputOnFocus={keyboardEnabled} // ✅ stop unwanted keyboard
-                    onFocus={() => setIsOpen(true)}
-                    onChangeText={(text) => {
-                        if (!keyboardEnabled) return; // 🚫 block typing
+                <View style={styles.dropdownContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Select option"
+                        placeholderTextColor={COLORS.placeholder}
+                        value={search || selectedValue}
+                        editable={keyboardEnabled}
+                        showSoftInputOnFocus={keyboardEnabled}
+                        onFocus={() => setIsOpen(true)}
+                        onChangeText={(text) => {
+                            if (!keyboardEnabled) return;
 
-                        setSearch(text);
-                        setIsOpen(true);
-                    }}
-                />
+                            setSearch(text);
+                            setIsOpen(true);
+                        }}
+                    />
+
+                    {/* Production Icon */}
+                    <Ionicons
+                        name={isOpen ? "chevron-up" : "chevron-down"}
+                        size={18}
+                        color={COLORS.textSecondary}
+                    />
+                </View>
             </TouchableOpacity>
 
-            {/* 🔽 Dropdown */}
+            {/* Dropdown Options */}
             {isOpen && (
                 <View style={styles.optionsContainer}>
-                    {(keyboardEnabled && search ? filteredOptions : options).map(
-                        (item, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                style={styles.option}
-                                onPress={() => handleSelect(item)}
-                            >
-                                <Text style={styles.optionText}>{item}</Text>
-                            </TouchableOpacity>
-                        )
-                    )}
+                    {(keyboardEnabled && search
+                        ? filteredOptions
+                        : options
+                    ).map((item, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={styles.option}
+                            onPress={() => handleSelect(item)}
+                        >
+                            <Text style={styles.optionText}>{item}</Text>
+                        </TouchableOpacity>
+                    ))}
 
-                    {/* No Results */}
-                    {keyboardEnabled && search !== "" && filteredOptions.length === 0 && (
-                        <Text style={styles.noResult}>No match found</Text>
-                    )}
+                    {/* No Result */}
+                    {keyboardEnabled &&
+                        search !== "" &&
+                        filteredOptions.length === 0 && (
+                            <Text style={styles.noResult}>
+                                No match found
+                            </Text>
+                        )}
                 </View>
             )}
         </View>
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
     container: {
         marginBottom: SPACING.medium,
     },
+
     label: {
         fontSize: TYPOGRAPHY.label,
         color: COLORS.textSecondary,
         marginBottom: SPACING.xs,
+        marginLeft: 2,
+        fontWeight: "500",
     },
 
-    input: {
+    // Dropdown Box
+    dropdownContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+
         borderWidth: 1,
         borderColor: COLORS.border,
-        padding: 12,
+
+        backgroundColor: COLORS.dropdownBg,
         borderRadius: 6,
-        fontSize: TYPOGRAPHY.input,
-        color: COLORS.textPrimary,
-        backgroundColor: COLORS.inputBg,
+
+        paddingHorizontal: 12,
     },
 
+    // Input Area
+    input: {
+        flex: 1,
+
+        paddingVertical: 12,
+
+        fontSize: TYPOGRAPHY.input,
+        color: COLORS.textPrimary,
+    },
+
+    // Options List
     optionsContainer: {
         borderWidth: 1,
         borderColor: COLORS.border,
         borderRadius: 6,
+
         marginTop: 6,
+
         backgroundColor: COLORS.card,
+
         maxHeight: 200,
+
+        overflow: "hidden",
     },
 
     option: {

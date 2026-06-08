@@ -1,13 +1,15 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
-import { COLORS, SPACING, TYPOGRAPHY } from "../theme";
-
+import { useTheme, SPACING, TYPOGRAPHY } from "../theme";
 export default function CustomButton({
     title,
     onPress,
     type = "primary",
     style = {},
 }) {
+    const { COLORS } = useTheme();
+    const styles = createStyles(COLORS);
+
     return (
         <TouchableOpacity
             activeOpacity={0.8}
@@ -30,7 +32,7 @@ export default function CustomButton({
     );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS) => StyleSheet.create({
     button: {
         paddingVertical: 14,
         borderRadius: 6,
